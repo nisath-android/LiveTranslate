@@ -2,35 +2,34 @@
 <html lang="ta">
 <head>
     <meta charset="UTF-8">
-    <title>AI Ultimate Assistant</title>
+    <title>AI Ultimate Assistant V2</title>
     <style>
         :root { --p: #007bff; --v: #e83e8c; }
         body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center; }
+        .card { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
         textarea, input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         
-        .option-box { margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 8px; font-weight: bold; }
-        .option-box input { margin-right: 5px; cursor: pointer; }
+        .option-box { margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 8px; font-weight: bold; text-align: center; }
+        .option-box input { cursor: pointer; }
 
         .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        button { flex: 1; padding: 12px; cursor: pointer; border: none; border-radius: 8px; color: white; font-weight: bold; transition: 0.3s; }
-        button:hover { opacity: 0.8; }
+        button { flex: 1; padding: 12px; cursor: pointer; border: none; border-radius: 8px; color: white; font-weight: bold; }
         
-        #video-display { display: none; margin-top: 20px; background: #000; border-radius: 10px; border: 4px solid var(--v); overflow: hidden; }
+        #video-container { display: none; margin-top: 20px; background: #000; border-radius: 10px; border: 4px solid var(--v); overflow: hidden; }
         video { width: 100%; display: block; }
         
-        .workaround-btn { display: block; margin-top: 15px; background: #6c757d; color: white; text-decoration: none; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: bold; }
+        .drive-btn { display: block; margin-top: 15px; background: #6c757d; color: white; text-decoration: none; padding: 10px; border-radius: 8px; font-weight: bold; text-align: center; }
         #response-box { margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; text-align: left; line-height: 1.6; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🤖 AI Video Bot</h2>
-    <input type="text" id="ngrokUrl" placeholder="Ngrok URL-ஐ இங்கே பேஸ்ட் செய்யவும்">
+    <h2>🤖 AI Video Assistant</h2>
+    <input type="text" id="ngrokUrl" placeholder="Paste Ngrok URL here">
     
     <div class="option-box">
-        Select Avatar: 
+        Choose Avatar: 
         <input type="radio" name="gender" value="male" checked> Male 👨
         <input type="radio" name="gender" value="female"> Female 👩
     </div>
@@ -38,16 +37,14 @@
     <textarea id="userInput" rows="4" placeholder="கேள்வியைக் கேட்கவும்..."></textarea>
     
     <div class="btn-group">
-        <button style="background:var(--p)" onclick="callApi('ask')">Ask Chatbot</button>
-        <button style="background:var(--v)" onclick="callApi('ask_video')">Ask Video Bot</button>
+        <button style="background:var(--p)" onclick="callApi('ask')">Ask Chat</button>
+        <button style="background:var(--v)" onclick="callApi('ask_video')">Video Bot</button>
     </div>
 
-    <a href="YOUR_SHAREABLE_DRIVE_FOLDER_LINK" target="_blank" class="workaround-btn">📂 Open AI_Bot Folder in Drive (Workaround)</a>
+    <a href="https://drive.google.com/drive/folders/1lZnsfRTV9BM3inNyXTAGxKJIcvN5inJO?usp=sharing" target="_blank" class="drive-btn">📂 Open AI_Bot Folder in Drive (Workaround)</a>
 
-    <div id="video-display">
-        <video id="aiVideo" controls playsinline>
-            <source src="" type="video/mp4">
-        </video>
+    <div id="video-container">
+        <video id="aiVideo" controls playsinline></video>
     </div>
 
     <div id="response-box">Waiting for request...</div>
@@ -58,14 +55,14 @@
         const text = document.getElementById('userInput').value;
         const baseUrl = document.getElementById('ngrokUrl').value;
         const respBox = document.getElementById('response-box');
-        const vDisplay = document.getElementById('video-display');
+        const vContainer = document.getElementById('video-container');
         const vPlayer = document.getElementById('aiVideo');
         const gender = document.querySelector('input[name="gender"]:checked').value;
 
         if (!baseUrl || !text) return alert("URL and Text required!");
 
         respBox.innerText = "Processing... Please wait.";
-        vDisplay.style.display = "none";
+        vContainer.style.display = "none";
 
         try {
             const response = await fetch(`${baseUrl.replace(/\/$/, "")}/${mode}`, {
@@ -74,17 +71,15 @@
                 body: JSON.stringify({ text: text, gender: gender })
             });
             const data = await response.json();
-            respBox.innerText = data.result || "Error in processing";
+            respBox.innerText = data.result || "Error occurred";
 
             if (mode === 'ask_video' && data.video_url) {
-                vDisplay.style.display = "block";
+                vContainer.style.display = "block";
                 
-                // Blob Fetching முறை - இது பிளாங்க் விண்டோவைத் தவிர்க்கும்
+                // Blob Fetching முறை - இது பிளேயர் பிழைகளைத் தவிர்க்கும்
                 const videoRes = await fetch(data.video_url);
                 const blob = await videoRes.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                
-                vPlayer.src = blobUrl;
+                vPlayer.src = URL.createObjectURL(blob);
                 vPlayer.load();
                 vPlayer.play().catch(() => { vPlayer.controls = true; });
             }
