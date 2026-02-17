@@ -2,89 +2,129 @@
 <html lang="ta">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Ultimate Assistant V2</title>
     <style>
-        :root { --p: #007bff; --v: #e83e8c; }
-        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        textarea, input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        :root {
+            --primary: #007bff;
+            --secondary: #6c757d;
+            --video-accent: #e83e8c;
+            --bg: #f8f9fa;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); display: flex; justify-content: center; padding: 20px; margin: 0; }
+        .card { background: white; width: 100%; max-width: 600px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
         
-        .option-box { margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 8px; font-weight: bold; text-align: center; }
-        .option-box input { cursor: pointer; }
+        h2 { color: #333; margin-bottom: 20px; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        
+        /* பாலினத் தேர்வு (Gender Selection) */
+        .options-panel { margin: 15px 0; padding: 15px; background: #f1f3f5; border-radius: 10px; display: flex; justify-content: center; gap: 20px; font-weight: bold; }
+        .options-panel input { width: auto; margin-right: 5px; cursor: pointer; }
 
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        button { flex: 1; padding: 12px; cursor: pointer; border: none; border-radius: 8px; color: white; font-weight: bold; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        button { padding: 12px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; transition: 0.3s; font-size: 14px; }
         
-        #video-container { display: none; margin-top: 20px; background: #000; border-radius: 10px; border: 4px solid var(--v); overflow: hidden; }
+        .btn-ask { background-color: var(--primary); }
+        .btn-translate { background-color: #28a745; }
+        .btn-video { background-color: var(--video-accent); }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        /* வீடியோ பகுதி */
+        #video-container { display: none; margin-top: 25px; border-radius: 15px; overflow: hidden; border: 4px solid var(--video-accent); background: #000; position: relative; }
         video { width: 100%; display: block; }
+
+        /* டிரைவ் பட்டன் */
+        .drive-link { display: inline-block; margin-top: 15px; background: var(--secondary); color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; }
         
-        .drive-btn { display: block; margin-top: 15px; background: #6c757d; color: white; text-decoration: none; padding: 10px; border-radius: 8px; font-weight: bold; text-align: center; }
-        #response-box { margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; text-align: left; line-height: 1.6; }
+        /* பதில் பகுதி */
+        #response-area { margin-top: 25px; text-align: left; }
+        #response-box { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #eee; max-height: 250px; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; color: #444; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h2>🤖 AI Video Assistant</h2>
-    <input type="text" id="ngrokUrl" placeholder="Paste Ngrok URL here">
     
-    <div class="option-box">
-        Choose Avatar: 
-        <input type="radio" name="gender" value="male" checked> Male 👨
-        <input type="radio" name="gender" value="female"> Female 👩
+    <input type="text" id="ngrokUrl" placeholder="Ngrok URL-ஐ இங்கே பேஸ்ட் செய்யவும் (e.g. https://xxxx.ngrok.free.app)">
+    
+    <div class="options-panel">
+        <span>Avatar: </span>
+        <label><input type="radio" name="gender" value="male" checked> Male 👨</label>
+        <label><input type="radio" name="gender" value="female"> Female 👩</label>
     </div>
 
-    <textarea id="userInput" rows="4" placeholder="கேள்வியைக் கேட்கவும்..."></textarea>
+    <textarea id="userInput" rows="4" placeholder="ஆங்கிலத்தில் அல்லது தமிழில் கேள்வியைக் கேட்கவும்..."></textarea>
     
     <div class="btn-group">
-        <button style="background:var(--p)" onclick="callApi('ask')">Ask Chat</button>
-        <button style="background:var(--v)" onclick="callApi('ask_video')">Video Bot</button>
+        <button class="btn-translate" onclick="callApi('translate')">Translate</button>
+        <button class="btn-ask" onclick="callApi('ask')">Ask Chat</button>
+        <button class="btn-video" onclick="callApi('ask_video')">Video Bot</button>
     </div>
 
-    <a href="https://drive.google.com/drive/folders/1lZnsfRTV9BM3inNyXTAGxKJIcvN5inJO?usp=sharing" target="_blank" class="drive-btn">📂 Open AI_Bot Folder in Drive (Workaround)</a>
+    <a href="https://drive.google.com/drive/folders/1lZnsfRTV9BM3inNyXTAGxKJIcvN5inJO?usp=sharing" target="_blank" class="drive-link">
+        📂 View in Google Drive (Workaround)
+    </a>
 
     <div id="video-container">
-        <video id="aiVideo" controls playsinline></video>
+        <video id="aiVideo" controls playsinline poster="https://via.placeholder.com/600x400/000000/FFFFFF?text=Generating+Video..."></video>
     </div>
 
-    <div id="response-box">Waiting for request...</div>
+    <div id="response-area">
+        <strong>பதில் (Response):</strong>
+        <div id="response-box">காத்திருக்கிறது...</div>
+    </div>
 </div>
 
 <script>
     async function callApi(mode) {
         const text = document.getElementById('userInput').value;
-        const baseUrl = document.getElementById('ngrokUrl').value;
-        const respBox = document.getElementById('response-box');
+        const baseUrl = document.getElementById('ngrokUrl').value.replace(/\/$/, "");
+        const responseBox = document.getElementById('response-box');
         const vContainer = document.getElementById('video-container');
         const vPlayer = document.getElementById('aiVideo');
         const gender = document.querySelector('input[name="gender"]:checked').value;
 
-        if (!baseUrl || !text) return alert("URL and Text required!");
+        if (!baseUrl || !text) {
+            alert("URL மற்றும் உரையை உள்ளிடவும்!");
+            return;
+        }
 
-        respBox.innerText = "Processing... Please wait.";
+        responseBox.innerText = "Processing... தயவுசெய்து காத்திருக்கவும்.";
         vContainer.style.display = "none";
 
         try {
-            const response = await fetch(`${baseUrl.replace(/\/$/, "")}/${mode}`, {
+            const response = await fetch(`${baseUrl}/${mode}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text: text, gender: gender })
             });
+
             const data = await response.json();
-            respBox.innerText = data.result || "Error occurred";
+            responseBox.innerText = data.result || (data.error ? "Error: " + data.error : "No response");
 
             if (mode === 'ask_video' && data.video_url) {
                 vContainer.style.display = "block";
                 
-                // Blob Fetching முறை - இது பிளேயர் பிழைகளைத் தவிர்க்கும்
+                // பிளாங்க் விண்டோவைத் தவிர்க்க Blob Fetch முறை
+                console.log("Fetching video blob from:", data.video_url);
                 const videoRes = await fetch(data.video_url);
                 const blob = await videoRes.blob();
-                vPlayer.src = URL.createObjectURL(blob);
+                const blobUrl = URL.createObjectURL(blob);
+                
+                vPlayer.src = blobUrl;
                 vPlayer.load();
-                vPlayer.play().catch(() => { vPlayer.controls = true; });
+                vPlayer.play().catch(e => {
+                    console.log("Autoplay blocked, showing controls.");
+                    vPlayer.controls = true;
+                });
             }
-        } catch (e) { respBox.innerText = "Server Connection Error!"; }
+        } catch (error) {
+            responseBox.innerText = "சர்வர் கனெக்ஷன் தோல்வி! Ngrok மற்றும் Colab Server-ஐச் சரிபார்க்கவும்.";
+        }
     }
 </script>
+
 </body>
 </html>
