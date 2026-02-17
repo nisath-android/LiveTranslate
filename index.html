@@ -3,169 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Ultimate Video Bot</title>
+    <title>AI Ultimate Bot V2</title>
     <style>
-        :root {
-            --primary: #007bff;
-            --success: #28a745;
-            --video-color: #e83e8c;
-            --bg-color: #f0f2f5;
-        }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .card { background: white; width: 100%; max-width: 650px; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
-        
-        h2 { color: #333; margin-bottom: 20px; }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        
-        /* Gender Selection Styles */
-        .gender-selector { margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 8px; display: flex; justify-content: center; gap: 20px; font-weight: bold; }
-        .gender-selector input { width: auto; margin-right: 5px; cursor: pointer; }
-
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
-        button { padding: 12px; cursor: pointer; border: none; border-radius: 8px; color: white; font-weight: bold; transition: 0.3s; font-size: 15px; }
-        .btn-translate { background-color: var(--success); }
-        .btn-ask { background-color: var(--primary); }
-        .btn-video { background-color: var(--video-color); }
-        button:hover { opacity: 0.85; transform: translateY(-2px); }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
-
-        /* Video Section */
-        #video-wrapper { display: none; margin-top: 20px; background: #000; border-radius: 12px; overflow: hidden; border: 4px solid var(--video-color); position: relative; min-height: 200px; }
-        video { width: 100%; display: block; background: #000; }
-
-        /* Output Box for Large Text */
-        .output-container { margin-top: 25px; text-align: left; }
-        .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        #response-box { 
-            background: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #eee;
-            max-height: 350px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;
-            line-height: 1.6; color: #444; font-size: 16px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .copy-btn { background: #6c757d; padding: 6px 15px; font-size: 13px; width: auto; }
-        .status-msg { font-size: 14px; color: #666; margin-top: 10px; font-style: italic; }
+        :root { --p: #007bff; --s: #28a745; --v: #e83e8c; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        textarea, input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .gender-box { margin: 15px 0; padding: 10px; background: #eee; border-radius: 8px; font-weight: bold; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        button { padding: 12px; cursor: pointer; border: none; border-radius: 8px; color: white; font-weight: bold; }
+        #video-container { display: none; margin-top: 20px; background: #000; border-radius: 10px; border: 4px solid var(--v); }
+        video { width: 100%; border-radius: 5px; }
+        #response-box { margin-top: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; text-align: left; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🤖 AI Ultimate Video Bot</h2>
+    <h2>🤖 AI Video Assistant</h2>
+    <input type="text" id="ngrokUrl" placeholder="Paste Ngrok URL here">
     
-    <input type="text" id="ngrokUrl" placeholder="Ngrok URL-ஐ இங்கே பேஸ்ட் செய்யவும் (e.g. https://xxxx.ngrok-free.app)">
-    
-    <div class="gender-selector">
-        <span>Avatar: </span>
-        <label><input type="radio" name="gender" value="male" checked> Male 👨</label>
-        <label><input type="radio" name="gender" value="female"> Female 👩</label>
+    <div class="gender-box">
+        Choose Avatar: 
+        <input type="radio" name="gender" value="male" checked> Male 👨
+        <input type="radio" name="gender" value="female"> Female 👩
     </div>
 
-    <textarea id="userInput" rows="4" placeholder="ஆங்கிலத்தில் அல்லது தமிழில் டைப் செய்யவும்..."></textarea>
+    <textarea id="userInput" rows="4" placeholder="Type your question..."></textarea>
     
     <div class="btn-group">
-        <button class="btn-translate" id="tBtn" onclick="callApi('translate')">Translate</button>
-        <button class="btn-ask" id="aBtn" onclick="callApi('ask')">Ask AI</button>
-        <button class="btn-video" id="vBtn" onclick="callApi('ask_video')">Video Bot</button>
+        <button style="background:var(--s)" onclick="callApi('translate')">Translate</button>
+        <button style="background:var(--p)" onclick="callApi('ask')">Ask AI</button>
+        <button style="background:var(--v)" id="vBtn" onclick="callApi('ask_video')">Video Bot</button>
     </div>
 
-    <p id="status" class="status-msg"></p>
-
-    <div id="video-wrapper">
-        <video id="aiVideo" playsinline>
-            <source id="videoSource" src="" type="video/mp4">
-            உங்கள் பிரவுசர் வீடியோவை ஆதரிக்கவில்லை.
-        </video>
+    <div id="video-container">
+        <video id="aiVideo" controls playsinline></video>
     </div>
 
-    <div class="output-container">
-        <div class="output-header">
-            <strong>AI Response:</strong>
-            <button class="copy-btn" onclick="copyText()">Copy Text</button>
-        </div>
-        <div id="response-box">Waiting for your request...</div>
-    </div>
+    <div id="response-box">Waiting for input...</div>
 </div>
-
-
 
 <script>
     async function callApi(mode) {
         const text = document.getElementById('userInput').value;
         const baseUrl = document.getElementById('ngrokUrl').value;
-        const responseBox = document.getElementById('response-box');
-        const status = document.getElementById('status');
-        const videoWrapper = document.getElementById('video-wrapper');
-        const videoPlayer = document.getElementById('aiVideo');
-        
-        // Get Selected Gender
+        const respBox = document.getElementById('response-box');
+        const vContainer = document.getElementById('video-container');
+        const vPlayer = document.getElementById('aiVideo');
         const gender = document.querySelector('input[name="gender"]:checked').value;
 
-        if (!baseUrl || !text) {
-            alert("URL மற்றும் உரையைத் தயவுசெய்து உள்ளிடவும்!");
-            return;
-        }
+        if (!baseUrl || !text) return alert("Fill URL and Text!");
 
-        // Reset UI
-        responseBox.innerText = "AI சிந்தித்துக் கொண்டிருக்கிறது...";
-        status.innerText = mode === 'ask_video' ? "வீடியோ உருவாக்கப்படுகிறது... (1 நிமிடம் ஆகலாம்)" : "பதில் தயாராகிறது...";
-        toggleButtons(true);
-        videoWrapper.style.display = "none";
-
-        const cleanUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+        respBox.innerText = "Processing... Please wait.";
+        vContainer.style.display = "none";
 
         try {
-            const response = await fetch(`${cleanUrl}/${mode}`, {
+            const response = await fetch(`${baseUrl.replace(/\/$/, "")}/${mode}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text: text, gender: gender })
             });
-
             const data = await response.json();
+            respBox.innerText = data.result || data.error;
 
-            if (data.error) {
-                responseBox.innerText = "Error: " + data.error;
-                status.innerText = "தோல்வி!";
-            } else {
-                responseBox.innerText = data.result;
-
-                if (mode === 'ask_video' && data.video_url) {
-                    status.innerText = "வீடியோ தயார்! பிளே ஆகிறது...";
-                    videoWrapper.style.display = "block";
-                    
-                    // பிளாங்க் வியூவைத் தவிர்க்க வீடியோவை முறையாக ரீலோட் செய்தல்
-                    videoPlayer.pause();
-                    // URL-ல் timestamp சேர்ப்பதன் மூலம் Cache தவிர்க்கப்படுகிறது
-                    videoPlayer.src = data.video_url; 
-                    videoPlayer.load();
-                    
-                    // வீடியோ லோட் ஆன பிறகு பிளே செய்தல்
-                    videoPlayer.oncanplay = () => {
-                        videoPlayer.play().catch(e => {
-                            console.log("Autoplay blocked, showing controls.");
-                            videoPlayer.controls = true;
-                        });
-                    };
-                } else {
-                    status.innerText = "வெற்றி!";
-                }
+            if (mode === 'ask_video' && data.video_url) {
+                vContainer.style.display = "block";
+                // Blob Fetching to fix black screen
+                const videoRes = await fetch(data.video_url);
+                const blob = await videoRes.blob();
+                vPlayer.src = URL.createObjectURL(blob);
+                vPlayer.load();
+                vPlayer.play();
             }
-        } catch (error) {
-            responseBox.innerText = "கனெக்ஷன் தோல்வி! Ngrok URL மற்றும் Server-ஐச் சரிபார்க்கவும்.";
-            status.innerText = "எரர்!";
-        } finally {
-            toggleButtons(false);
-        }
-    }
-
-    function toggleButtons(state) {
-        document.getElementById('tBtn').disabled = state;
-        document.getElementById('aBtn').disabled = state;
-        document.getElementById('vBtn').disabled = state;
-    }
-
-    function copyText() {
-        const text = document.getElementById('response-box').innerText;
-        navigator.clipboard.writeText(text).then(() => alert("Copied!"));
+        } catch (e) { respBox.innerText = "Connection Error!"; }
     }
 </script>
-
 </body>
 </html>
