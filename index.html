@@ -2,56 +2,76 @@
 <html lang="ta">
 <head>
     <meta charset="UTF-8">
-    <title>AI Multi-Tool - Support Large Text</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Bot & Translator</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #f0f2f5; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 12px; max-width: 600px; margin: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        textarea, input { width: 95%; margin: 10px 0; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
-        
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        button { flex: 1; padding: 12px; cursor: pointer; border: none; border-radius: 8px; color: white; font-weight: bold; transition: 0.3s; }
-        
-        .btn-translate { background: #28a745; }
-        .btn-translate:hover { background: #218838; }
-        .btn-ask { background: #007bff; }
-        .btn-ask:hover { background: #0069d9; }
-
-        /* பெரிய உரைகளுக்கான அவுட்புட் செட்டிங்ஸ் */
-        #output { 
-            margin-top: 20px; 
-            padding: 20px; 
-            background: #ffffff; 
-            border-radius: 8px; 
-            text-align: left; 
-            border: 1px solid #eee;
-            max-height: 450px; 
-            overflow-y: auto; 
-            white-space: pre-wrap; 
-            word-wrap: break-word;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-            line-height: 1.6;
+        :root {
+            --primary: #007bff;
+            --success: #28a745;
+            --video: #e83e8c;
+            --bg: #f4f7f9;
         }
-        .copy-btn { background: #6c757d; width: auto; padding: 5px 15px; margin-bottom: 10px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; width: 100%; max-width: 700px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        
+        h2 { color: #333; margin-bottom: 20px; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 15px 0; }
+        button { padding: 12px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; transition: 0.3s; font-size: 14px; }
+        
+        .btn-translate { background-color: var(--success); }
+        .btn-ask { background-color: var(--primary); }
+        .btn-video { background-color: var(--video); }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        /* வீடியோ பகுதி */
+        #video-container { display: none; margin-top: 20px; border-radius: 15px; overflow: hidden; border: 3px solid var(--video); background: #000; }
+        video { width: 100%; display: block; }
+
+        /* அவுட்புட் பாக்ஸ் (பெரிய உரைகளுக்காக) */
+        #output-area { margin-top: 20px; text-align: left; }
+        .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        #response-box { 
+            background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #eee;
+            max-height: 400px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;
+            line-height: 1.6; color: #333; font-size: 16px;
+        }
+        .copy-btn { background: #6c757d; padding: 5px 12px; font-size: 12px; }
+        .status { font-size: 14px; color: #666; font-style: italic; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>🤖 AI Multi-Tool</h2>
-    <input type="text" id="ngrokUrl" placeholder="Paste Ngrok URL here (e.g., https://...ngrok-free.app)">
-    <textarea id="userInput" rows="5" placeholder="Type your text or question here..."></textarea>
+<div class="container">
+    <h2>🤖 AI Ultimate Bot</h2>
+    
+    <input type="text" id="ngrokUrl" placeholder="Ngrok URL-ஐ இங்கே பேஸ்ட் செய்யவும் (e.g. https://xxxx.ngrok-free.app)">
+    
+    <textarea id="userInput" rows="5" placeholder="ஆங்கிலத்தில் டைப் செய்யவும் அல்லது கேள்விகளைக் கேட்கவும்..."></textarea>
     
     <div class="btn-group">
-        <button class="btn-translate" onclick="callApi('translate')">Translate to Tamil</button>
-        <button class="btn-ask" onclick="callApi('ask')">Ask AI Details</button>
+        <button class="btn-translate" id="btn-t" onclick="callApi('translate')">Translate</button>
+        <button class="btn-ask" id="btn-a" onclick="callApi('ask')">Ask AI</button>
+        <button class="btn-video" id="btn-v" onclick="callApi('ask_video')">Video Bot</button>
     </div>
 
-    <div style="text-align: right; margin-top: 15px;">
-        <button class="copy-btn" onclick="copyText()">Copy Response</button>
+    <p id="status-text" class="status"></p>
+
+    <div id="video-container">
+        <video id="aiVideo" controls>
+            <source id="videoSource" src="" type="video/mp4">
+            Your browser does not support video.
+        </video>
     </div>
-    
-    <div id="output">
-        <p id="responseText" style="color: #555;">Waiting for your input...</p>
+
+    <div id="output-area">
+        <div class="output-header">
+            <strong>பதில் (Response):</strong>
+            <button class="copy-btn" onclick="copyText()">Copy Text</button>
+        </div>
+        <div id="response-box">காத்திருக்கிறது...</div>
     </div>
 </div>
 
@@ -59,15 +79,20 @@
     async function callApi(mode) {
         const text = document.getElementById('userInput').value;
         const baseUrl = document.getElementById('ngrokUrl').value;
-        const display = document.getElementById('responseText');
+        const responseBox = document.getElementById('response-box');
+        const statusText = document.getElementById('status-text');
+        const videoContainer = document.getElementById('video-container');
+        const videoPlayer = document.getElementById('aiVideo');
 
-        if (!baseUrl || !text) { 
-            alert("Please provide both Ngrok URL and text!"); 
-            return; 
+        if (!baseUrl || !text) {
+            alert("URL மற்றும் உரையை உள்ளிடவும்!");
+            return;
         }
 
-        display.innerText = "Processing... Please wait.";
-        display.style.color = "#888";
+        // UI-ஐ லோடிங் நிலைக்கு மாற்றுதல்
+        responseBox.innerText = "சிந்திக்கிறது... தயவுசெய்து காத்திருக்கவும்.";
+        statusText.innerText = mode === 'ask_video' ? "வீடியோ உருவாக்கப்படுகிறது (இது 1 நிமிடம் வரை ஆகலாம்)..." : "பதில் தயாராகிறது...";
+        setButtonsDisabled(true);
 
         const cleanUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
 
@@ -77,24 +102,44 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text: text })
             });
+
             const data = await response.json();
-            
-            // அவுட்புட் வந்தவுடன் கலரை மாற்றி உரையை செட் செய்கிறோம்
-            display.style.color = "#333";
-            display.innerText = data.result || "No response from AI.";
-            
-        } catch (err) {
-            display.innerText = "Error: Could not connect to the server. Check your Ngrok URL.";
-            display.style.color = "red";
+
+            if (data.error) {
+                responseBox.innerText = "Error: " + data.error;
+            } else {
+                responseBox.innerText = data.result;
+
+                // வீடியோ மோட் என்றால் வீடியோவை இயக்குதல்
+                if (mode === 'ask_video' && data.video_url) {
+                    videoContainer.style.display = 'block';
+                    // கேச் (Cache) தவிர்க்க நேரத்தை இணைக்கிறோம்
+                    videoPlayer.src = data.video_url + "?t=" + new Date().getTime();
+                    videoPlayer.load();
+                    videoPlayer.play();
+                } else {
+                    videoContainer.style.display = 'none';
+                }
+            }
+            statusText.innerText = "முடிந்தது!";
+        } catch (error) {
+            responseBox.innerText = "சர்வர் கனெக்ஷன் தோல்வி! URL சரியாக உள்ளதா எனப் பார்க்கவும்.";
+            statusText.innerText = "தோல்வி!";
+        } finally {
+            setButtonsDisabled(false);
         }
     }
 
+    function setButtonsDisabled(state) {
+        document.getElementById('btn-t').disabled = state;
+        document.getElementById('btn-a').disabled = state;
+        document.getElementById('btn-v').disabled = state;
+    }
+
     function copyText() {
-        const text = document.getElementById('responseText').innerText;
-        if(text === "Waiting for your input..." || text === "Processing...") return;
-        
+        const text = document.getElementById('response-box').innerText;
         navigator.clipboard.writeText(text).then(() => {
-            alert("Copied to clipboard!");
+            alert("Text copied!");
         });
     }
 </script>
