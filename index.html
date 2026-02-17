@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Translator - English to Tamil</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #f4f7f6; padding: 40px; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        input[type="text"], textarea { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        button { background-color: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:hover { background-color: #0056b3; }
+        #result-box { margin-top: 25px; padding: 15px; background: #e9ecef; border-radius: 8px; min-height: 50px; }
+        .loading { color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🤖 AI Tamil Translator</h2>
+    
+    <input type="text" id="ngrokUrl" placeholder="Paste Ngrok URL here (e.g., https://xxxx.ngrok-free.app)">
+    
+    <textarea id="engText" rows="4" placeholder="Enter English text to translate..."></textarea>
+    
+    <br>
+    <button onclick="translateText()">Translate to Tamil</button>
+
+    <div id="result-box">
+        <strong>Result:</strong>
+        <p id="tamilResult">உங்கள் மொழிபெயர்ப்பு இங்கே தோன்றும்...</p>
+    </div>
+</div>
+
+<script>
+    async function translateText() {
+        const text = document.getElementById('engText').value;
+        const baseUrl = document.getElementById('ngrokUrl').value;
+        const resDisplay = document.getElementById('tamilResult');
+
+        if (!baseUrl) {
+            alert("தயவுசெய்து Ngrok URL-ஐ உள்ளிடவும்!");
+            return;
+        }
+
+        if (!text) {
+            alert("ஏதேனும் வாக்கியத்தைத் டைப் செய்யவும்!");
+            return;
+        }
+
+        resDisplay.innerText = "மொழிபெயர்க்கப்படுகிறது... (Translating...)";
+        resDisplay.className = "loading";
+
+        try {
+            // URL-ன் இறுதியில் /translate இருப்பதை உறுதி செய்கிறோம்
+            const cleanUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+            
+            const response = await fetch(`${cleanUrl}/translate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text })
+            });
+
+            const data = await response.json();
+            
+            if (data.tamil_text) {
+                resDisplay.innerText = data.tamil_text;
+            } else {
+                resDisplay.innerText = "பிழை: " + (data.error || "தெரியாத பிழை");
+            }
+        } catch (error) {
+            resDisplay.innerText = "சர்வர் கனெக்ஷன் தோல்வி! URL சரியாக உள்ளதா எனப் பார்க்கவும்.";
+            console.error(error);
+        }
+        resDisplay.className = "";
+    }
+</script>
+
+</body>
+</html>
