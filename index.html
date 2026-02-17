@@ -2,46 +2,55 @@
 <html lang="ta">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Ultimate Bot V2</title>
+    <title>AI Ultimate Assistant</title>
     <style>
-        :root { --p: #007bff; --s: #28a745; --v: #e83e8c; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        :root { --p: #007bff; --v: #e83e8c; }
+        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; width: 100%; max-width: 600px; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); text-align: center; }
         textarea, input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .gender-box { margin: 15px 0; padding: 10px; background: #eee; border-radius: 8px; font-weight: bold; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        button { padding: 12px; cursor: pointer; border: none; border-radius: 8px; color: white; font-weight: bold; }
-        #video-container { display: none; margin-top: 20px; background: #000; border-radius: 10px; border: 4px solid var(--v); }
-        video { width: 100%; border-radius: 5px; }
-        #response-box { margin-top: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; text-align: left; }
+        
+        .option-box { margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 8px; font-weight: bold; }
+        .option-box input { margin-right: 5px; cursor: pointer; }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        button { flex: 1; padding: 12px; cursor: pointer; border: none; border-radius: 8px; color: white; font-weight: bold; transition: 0.3s; }
+        button:hover { opacity: 0.8; }
+        
+        #video-display { display: none; margin-top: 20px; background: #000; border-radius: 10px; border: 4px solid var(--v); overflow: hidden; }
+        video { width: 100%; display: block; }
+        
+        .workaround-btn { display: block; margin-top: 15px; background: #6c757d; color: white; text-decoration: none; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: bold; }
+        #response-box { margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; text-align: left; line-height: 1.6; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🤖 AI Video Assistant</h2>
-    <input type="text" id="ngrokUrl" placeholder="Paste Ngrok URL here">
+    <h2>🤖 AI Video Bot</h2>
+    <input type="text" id="ngrokUrl" placeholder="Ngrok URL-ஐ இங்கே பேஸ்ட் செய்யவும்">
     
-    <div class="gender-box">
-        Choose Avatar: 
+    <div class="option-box">
+        Select Avatar: 
         <input type="radio" name="gender" value="male" checked> Male 👨
         <input type="radio" name="gender" value="female"> Female 👩
     </div>
 
-    <textarea id="userInput" rows="4" placeholder="Type your question..."></textarea>
+    <textarea id="userInput" rows="4" placeholder="கேள்வியைக் கேட்கவும்..."></textarea>
     
     <div class="btn-group">
-        <button style="background:var(--s)" onclick="callApi('translate')">Translate</button>
-        <button style="background:var(--p)" onclick="callApi('ask')">Ask AI</button>
-        <button style="background:var(--v)" id="vBtn" onclick="callApi('ask_video')">Video Bot</button>
+        <button style="background:var(--p)" onclick="callApi('ask')">Ask Chatbot</button>
+        <button style="background:var(--v)" onclick="callApi('ask_video')">Ask Video Bot</button>
     </div>
 
-    <div id="video-container">
-        <video id="aiVideo" controls playsinline></video>
+    <a href="YOUR_SHAREABLE_DRIVE_FOLDER_LINK" target="_blank" class="workaround-btn">📂 Open AI_Bot Folder in Drive (Workaround)</a>
+
+    <div id="video-display">
+        <video id="aiVideo" controls playsinline>
+            <source src="" type="video/mp4">
+        </video>
     </div>
 
-    <div id="response-box">Waiting for input...</div>
+    <div id="response-box">Waiting for request...</div>
 </div>
 
 <script>
@@ -49,14 +58,14 @@
         const text = document.getElementById('userInput').value;
         const baseUrl = document.getElementById('ngrokUrl').value;
         const respBox = document.getElementById('response-box');
-        const vContainer = document.getElementById('video-container');
+        const vDisplay = document.getElementById('video-display');
         const vPlayer = document.getElementById('aiVideo');
         const gender = document.querySelector('input[name="gender"]:checked').value;
 
-        if (!baseUrl || !text) return alert("Fill URL and Text!");
+        if (!baseUrl || !text) return alert("URL and Text required!");
 
         respBox.innerText = "Processing... Please wait.";
-        vContainer.style.display = "none";
+        vDisplay.style.display = "none";
 
         try {
             const response = await fetch(`${baseUrl.replace(/\/$/, "")}/${mode}`, {
@@ -65,18 +74,21 @@
                 body: JSON.stringify({ text: text, gender: gender })
             });
             const data = await response.json();
-            respBox.innerText = data.result || data.error;
+            respBox.innerText = data.result || "Error in processing";
 
             if (mode === 'ask_video' && data.video_url) {
-                vContainer.style.display = "block";
-                // Blob Fetching to fix black screen
+                vDisplay.style.display = "block";
+                
+                // Blob Fetching முறை - இது பிளாங்க் விண்டோவைத் தவிர்க்கும்
                 const videoRes = await fetch(data.video_url);
                 const blob = await videoRes.blob();
-                vPlayer.src = URL.createObjectURL(blob);
+                const blobUrl = URL.createObjectURL(blob);
+                
+                vPlayer.src = blobUrl;
                 vPlayer.load();
-                vPlayer.play();
+                vPlayer.play().catch(() => { vPlayer.controls = true; });
             }
-        } catch (e) { respBox.innerText = "Connection Error!"; }
+        } catch (e) { respBox.innerText = "Server Connection Error!"; }
     }
 </script>
 </body>
