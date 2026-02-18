@@ -95,3 +95,51 @@
         try {
             const res = await fetch(`${baseUrl}/list_files`);
             const data = await res.json();
+            itemsDiv.innerHTML = "";
+            if (data.files && data.files.length > 0) {
+                data.files.forEach(file => {
+                    const div = document.createElement('div');
+                    div.className = 'file-item';
+                    div.innerHTML = `<span>📄 ${file}</span> <a href="${baseUrl}/view_file/${file}" target="_blank" class="view-btn">View</a>`;
+                    itemsDiv.appendChild(div);
+                });
+            } else { itemsDiv.innerHTML = "No files found in directory."; }
+        } catch (e) { itemsDiv.innerHTML = "Failed to connect to server."; }
+    }
+
+    async function callApi(mode) {
+        const text = document.getElementById('userInput').value;
+        const baseUrl = document.getElementById('ngrokUrl').value.replace(/\/$/, "");
+        const respBox = document.getElementById('response-box');
+        const vContainer = document.getElementById('video-container');
+        const vPlayer = document.getElementById('aiVideo');
+        const gender = document.querySelector('input[name="gender"]:checked').value;
+
+        if (!baseUrl || !text) return alert("Please enter URL and Text!");
+
+        respBox.innerText = "AI is thinking...";
+        vContainer.style.display = "none";
+
+        try {
+            const response = await fetch(`${baseUrl}/${mode}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text, gender: gender })
+            });
+            const data = await response.json();
+            respBox.innerText = data.result || (data.error ? "Error: " + data.error : "No response returned.");
+
+            if (mode === 'ask_video' && data.video_url) {
+                vContainer.style.display = "block";
+                const videoRes = await fetch(data.video_url);
+                const blob = await videoRes.blob();
+                vPlayer.src = URL.createObjectURL(blob);
+                vPlayer.load();
+                vPlayer.play().catch(e => console.log("Autoplay blocked"));
+            }
+        } catch (error) { respBox.innerText = "Server Connection Failed!"; }
+    }
+</script>
+
+</body>
+</html>
