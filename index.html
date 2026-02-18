@@ -3,44 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Bot - File Explorer</title>
+    <title>AI Bot - Integrated Version</title>
     <style>
-        :root { --primary: #007bff; --video-accent: #e83e8c; --bg: #f8f9fa; --success: #28a745; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; width: 100%; max-width: 600px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
-        button { padding: 12px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; }
+        :root { --primary: #007bff; --success: #28a745; --video-accent: #e83e8c; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); display: flex; justify-content: center; padding: 20px; margin: 0; }
+        .card { background: white; width: 100%; max-width: 650px; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; }
         
-        /* File List Styles */
-        .file-explorer { margin-top: 20px; text-align: left; background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #eee; }
-        .file-item { 
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px; border-bottom: 1px solid #f1f1f1; font-size: 14px;
-        }
-        .file-item:last-child { border-bottom: none; }
-        .view-btn { background: var(--success); padding: 4px 10px; font-size: 12px; text-decoration: none; color: white; border-radius: 4px; }
+        /* Input Styles */
+        label { display: block; text-align: left; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #eee; border-radius: 10px; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
+        input:focus, textarea:focus { border-color: var(--primary); outline: none; }
         
-        #video-container { display: none; margin-top: 25px; border-radius: 15px; overflow: hidden; border: 4px solid var(--video-accent); background: #000; }
+        .options-panel { margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; display: flex; justify-content: center; gap: 20px; font-weight: bold; }
+        .options-panel input { width: auto; margin: 0 5px 0 0; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        button { padding: 12px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 14px; transition: 0.2s; }
+        .btn-ask { background-color: var(--primary); }
+        .btn-translate { background-color: var(--success); }
+        .btn-video { background-color: var(--video-accent); }
+        .btn-explorer { background-color: #6c757d; width: 100%; margin-top: 10px; }
+        button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+        /* File Explorer */
+        .file-explorer { display: none; margin-top: 20px; text-align: left; background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; }
+        .file-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f1f1f1; }
+        .view-btn { background: var(--success); color: white; text-decoration: none; padding: 5px 12px; border-radius: 5px; font-size: 12px; }
+
+        #video-container { display: none; margin-top: 20px; border-radius: 15px; overflow: hidden; border: 4px solid var(--video-accent); background: #000; }
         video { width: 100%; display: block; }
-        #response-box { margin-top: 20px; background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #eee; text-align: left; }
+        #response-box { margin-top: 20px; background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #eee; text-align: left; min-height: 60px; white-space: pre-wrap; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🤖 AI Video Assistant</h2>
+    <h2>🤖 AI Bot Assistant</h2>
+    
+    <label for="ngrokUrl">Server Connection:</label>
     <input type="text" id="ngrokUrl" placeholder="Ngrok URL-ஐ இங்கே பேஸ்ட் செய்யவும்">
     
-    <div class="btn-group" style="grid-template-columns: 1fr 1fr; margin-bottom: 10px;">
-        <button style="background:var(--primary)" onclick="callApi('ask')">Ask AI</button>
-        <button style="background:var(--video-accent)" onclick="callApi('ask_video')">Video Bot</button>
+    <div class="options-panel">
+        <span>Avatar: </span>
+        <label><input type="radio" name="gender" value="male" checked> Male 👨</label>
+        <label><input type="radio" name="gender" value="female"> Female 👩</label>
     </div>
-    
-    <button style="background:#6c757d; width: 100%;" onclick="listFiles()">📂 List Files in AI_Bot Folder</button>
 
-    <div id="fileListArea" class="file-explorer" style="display:none;">
-        <strong>Files in Drive:</strong>
+    <label for="userInput">Enter Details / Question:</label>
+    <textarea id="userInput" rows="4" placeholder="உங்கள் கேள்வியை அல்லது விவரங்களை இங்கே டைப் செய்யவும்..."></textarea>
+    
+    <div class="btn-group">
+        <button class="btn-translate" onclick="callApi('translate')">Translate</button>
+        <button class="btn-ask" onclick="callApi('ask')">Ask Chat</button>
+        <button class="btn-video" onclick="callApi('ask_video')">Video Bot</button>
+    </div>
+
+    <button class="btn-explorer" onclick="listFiles()">📂 Drive File Explorer (/AI_Bot)</button>
+
+    <div id="fileExplorer" class="file-explorer">
+        <strong>டிரைவில் உள்ள கோப்புகள்:</strong>
         <div id="fileItems"></div>
     </div>
 
@@ -48,62 +69,57 @@
         <video id="aiVideo" controls playsinline></video>
     </div>
 
-    <div id="response-box">Waiting for request...</div>
+    <div id="response-box">AI பதிலுக்காகக் காத்திருக்கிறது...</div>
 </div>
+
+[Image of a web form showing a textarea input and action buttons]
 
 <script>
     async function listFiles() {
         const baseUrl = document.getElementById('ngrokUrl').value.replace(/\/$/, "");
-        if (!baseUrl) return alert("Ngrok URL-ai உள்ளிடவும்!");
+        if (!baseUrl) return alert("Ngrok URL தேவை!");
 
-        const fileArea = document.getElementById('fileListArea');
-        const fileItems = document.getElementById('fileItems');
-        fileItems.innerHTML = "Loading...";
-        fileArea.style.display = "block";
+        const explorer = document.getElementById('fileExplorer');
+        const itemsDiv = document.getElementById('fileItems');
+        itemsDiv.innerHTML = "கோப்புகள் பட்டியலிடப்படுகின்றன...";
+        explorer.style.display = "block";
 
         try {
             const res = await fetch(`${baseUrl}/list_files`);
             const data = await res.json();
-            
-            fileItems.innerHTML = "";
+            itemsDiv.innerHTML = "";
             if (data.files && data.files.length > 0) {
                 data.files.forEach(file => {
                     const div = document.createElement('div');
                     div.className = 'file-item';
-                    div.innerHTML = `
-                        <span>${file}</span>
-                        <a href="${baseUrl}/view_file/${file}" target="_blank" class="view-btn">View</a>
-                    `;
-                    fileItems.appendChild(div);
+                    div.innerHTML = `<span>📄 ${file}</span> <a href="${baseUrl}/view_file/${file}" target="_blank" class="view-btn">View</a>`;
+                    itemsDiv.appendChild(div);
                 });
-            } else {
-                fileItems.innerHTML = "No files found.";
-            }
-        } catch (e) {
-            fileItems.innerHTML = "Error loading files.";
-        }
+            } else { itemsDiv.innerHTML = "கோப்புகள் எதுவும் இல்லை."; }
+        } catch (e) { itemsDiv.innerHTML = "இணைப்புத் தோல்வி!"; }
     }
 
     async function callApi(mode) {
-        const text = "Hi"; // Default or get from input
+        const text = document.getElementById('userInput').value;
         const baseUrl = document.getElementById('ngrokUrl').value.replace(/\/$/, "");
         const respBox = document.getElementById('response-box');
         const vContainer = document.getElementById('video-container');
         const vPlayer = document.getElementById('aiVideo');
+        const gender = document.querySelector('input[name="gender"]:checked').value;
 
-        if (!baseUrl) return alert("URL required!");
+        if (!baseUrl || !text) return alert("URL மற்றும் உரையை உள்ளிடவும்!");
 
-        respBox.innerText = "Processing...";
+        respBox.innerText = "AI சிந்தித்துக் கொண்டிருக்கிறது...";
         vContainer.style.display = "none";
 
         try {
             const response = await fetch(`${baseUrl}/${mode}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: text, gender: 'male' })
+                body: JSON.stringify({ text: text, gender: gender })
             });
             const data = await response.json();
-            respBox.innerText = data.result || data.error;
+            respBox.innerText = data.result || (data.error ? "Error: " + data.error : "பதில் இல்லை");
 
             if (mode === 'ask_video' && data.video_url) {
                 vContainer.style.display = "block";
@@ -113,8 +129,6 @@
                 vPlayer.load();
                 vPlayer.play();
             }
-        } catch (error) { respBox.innerText = "Connection Error!"; }
+        } catch (error) { respBox.innerText = "சர்வர் இணைப்புத் தோல்வி!"; }
     }
 </script>
-</body>
-</html>
