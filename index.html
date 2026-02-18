@@ -3,36 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Bot - Integrated Version</title>
+    <title>AI Bot - Final Fixed UI</title>
     <style>
         :root { --primary: #007bff; --success: #28a745; --video-accent: #e83e8c; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .card { background: white; width: 100%; max-width: 650px; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; margin: 0; }
+        .card { background: white; width: 100%; max-width: 600px; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; /* எல்லாவற்றையும் நடுவில் வைக்கிறது */ }
         
-        /* Input Styles */
-        label { display: block; text-align: left; font-weight: bold; margin-bottom: 5px; color: #555; }
-        input, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #eee; border-radius: 10px; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
-        input:focus, textarea:focus { border-color: var(--primary); outline: none; }
-        
-        .options-panel { margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; display: flex; justify-content: center; gap: 20px; font-weight: bold; }
-        .options-panel input { width: auto; margin: 0 5px 0 0; }
+        h2 { color: #333; margin-bottom: 25px; }
 
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        button { padding: 12px; cursor: pointer; border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 14px; transition: 0.2s; }
+        /* --- திருத்தப்பட்ட பகுதி (Fixed CSS) --- */
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            color: #555;
+            /* text-align: left;  <-- இந்த வரியை நீக்கிவிட்டேன், இப்போது இது நடுவில் வரும் */
+        }
+        /* ------------------------------------- */
+
+        input[type="text"], textarea { width: 100%; padding: 14px; margin-bottom: 20px; border: 2px solid #eee; border-radius: 12px; font-size: 16px; box-sizing: border-box; transition: 0.3s; background: #fafafa; }
+        input:focus, textarea:focus { border-color: var(--primary); outline: none; background: #fff; }
+        
+        .options-panel { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 12px; display:inline-flex; justify-content: center; gap: 20px; font-weight: bold; align-items: center;}
+        .options-panel label { margin-bottom: 0; cursor: pointer; }
+        .options-panel input { width: auto; margin: 0 8px 0 0; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        button { padding: 14px; cursor: pointer; border: none; border-radius: 12px; color: white; font-weight: bold; font-size: 15px; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .btn-ask { background-color: var(--primary); }
         .btn-translate { background-color: var(--success); }
         .btn-video { background-color: var(--video-accent); }
-        .btn-explorer { background-color: #6c757d; width: 100%; margin-top: 10px; }
-        button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn-explorer { background-color: #6c757d; width: 100%; }
+        button:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0,0,0,0.15); }
+        button:active { transform: translateY(0); }
 
-        /* File Explorer */
-        .file-explorer { display: none; margin-top: 20px; text-align: left; background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; }
+        /* File Explorer & Video styling remains same... */
+        .file-explorer { display: none; margin-top: 20px; text-align: left; background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; }
         .file-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f1f1f1; }
-        .view-btn { background: var(--success); color: white; text-decoration: none; padding: 5px 12px; border-radius: 5px; font-size: 12px; }
-
-        #video-container { display: none; margin-top: 20px; border-radius: 15px; overflow: hidden; border: 4px solid var(--video-accent); background: #000; }
+        .view-btn { background: var(--success); color: white; text-decoration: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; }
+        #video-container { display: none; margin-top: 20px; border-radius: 15px; overflow: hidden; border: 4px solid var(--video-accent); background: #000; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         video { width: 100%; display: block; }
-        #response-box { margin-top: 20px; background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #eee; text-align: left; min-height: 60px; white-space: pre-wrap; }
+        #response-box { margin-top: 20px; background: #f8f9fa; padding: 20px; border-radius: 12px; border: 1px solid #eee; text-align: left; min-height: 60px; white-space: pre-wrap; font-size: 15px; line-height: 1.6; color: #333; }
     </style>
 </head>
 <body>
@@ -40,28 +51,27 @@
 <div class="card">
     <h2>🤖 AI Bot Assistant</h2>
     
-    <label for="ngrokUrl">Server Connection:</label>
-    <input type="text" id="ngrokUrl" placeholder="Ngrok URL-ஐ இங்கே பேஸ்ட் செய்யவும்">
+    <label for="ngrokUrl">Server Connection URL:</label>
+    <input type="text" id="ngrokUrl" placeholder="Paste your Ngrok URL here...">
     
     <div class="options-panel">
-        <span>Avatar: </span>
         <label><input type="radio" name="gender" value="male" checked> Male 👨</label>
         <label><input type="radio" name="gender" value="female"> Female 👩</label>
     </div>
 
     <label for="userInput">Enter Details / Question:</label>
-    <textarea id="userInput" rows="4" placeholder="உங்கள் கேள்வியை அல்லது விவரங்களை இங்கே டைப் செய்யவும்..."></textarea>
+    <textarea id="userInput" rows="5" placeholder="Type your message here..."></textarea>
     
     <div class="btn-group">
-        <button class="btn-translate" onclick="callApi('translate')">Translate</button>
-        <button class="btn-ask" onclick="callApi('ask')">Ask Chat</button>
-        <button class="btn-video" onclick="callApi('ask_video')">Video Bot</button>
+        <button class="btn-translate" onclick="callApi('translate')">Translate 🌐</button>
+        <button class="btn-ask" onclick="callApi('ask')">Ask AI 💬</button>
+        <button class="btn-video" onclick="callApi('ask_video')">Video Bot 🎬</button>
     </div>
 
-    <button class="btn-explorer" onclick="listFiles()">📂 Drive File Explorer (/AI_Bot)</button>
+    <button class="btn-explorer" onclick="listFiles()">📂 Open Drive File Explorer</button>
 
     <div id="fileExplorer" class="file-explorer">
-        <strong>டிரைவில் உள்ள கோப்புகள்:</strong>
+        <strong>Drive Files (/AI_Bot):</strong>
         <div id="fileItems"></div>
     </div>
 
@@ -69,66 +79,19 @@
         <video id="aiVideo" controls playsinline></video>
     </div>
 
-    <div id="response-box">AI பதிலுக்காகக் காத்திருக்கிறது...</div>
+    <div id="response-box">AI response will appear here...</div>
 </div>
-
-[Image of a web form showing a textarea input and action buttons]
 
 <script>
     async function listFiles() {
         const baseUrl = document.getElementById('ngrokUrl').value.replace(/\/$/, "");
-        if (!baseUrl) return alert("Ngrok URL தேவை!");
+        if (!baseUrl) return alert("Ngrok URL is missing!");
 
         const explorer = document.getElementById('fileExplorer');
         const itemsDiv = document.getElementById('fileItems');
-        itemsDiv.innerHTML = "கோப்புகள் பட்டியலிடப்படுகின்றன...";
+        itemsDiv.innerHTML = "Loading files...";
         explorer.style.display = "block";
 
         try {
             const res = await fetch(`${baseUrl}/list_files`);
             const data = await res.json();
-            itemsDiv.innerHTML = "";
-            if (data.files && data.files.length > 0) {
-                data.files.forEach(file => {
-                    const div = document.createElement('div');
-                    div.className = 'file-item';
-                    div.innerHTML = `<span>📄 ${file}</span> <a href="${baseUrl}/view_file/${file}" target="_blank" class="view-btn">View</a>`;
-                    itemsDiv.appendChild(div);
-                });
-            } else { itemsDiv.innerHTML = "கோப்புகள் எதுவும் இல்லை."; }
-        } catch (e) { itemsDiv.innerHTML = "இணைப்புத் தோல்வி!"; }
-    }
-
-    async function callApi(mode) {
-        const text = document.getElementById('userInput').value;
-        const baseUrl = document.getElementById('ngrokUrl').value.replace(/\/$/, "");
-        const respBox = document.getElementById('response-box');
-        const vContainer = document.getElementById('video-container');
-        const vPlayer = document.getElementById('aiVideo');
-        const gender = document.querySelector('input[name="gender"]:checked').value;
-
-        if (!baseUrl || !text) return alert("URL மற்றும் உரையை உள்ளிடவும்!");
-
-        respBox.innerText = "AI சிந்தித்துக் கொண்டிருக்கிறது...";
-        vContainer.style.display = "none";
-
-        try {
-            const response = await fetch(`${baseUrl}/${mode}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: text, gender: gender })
-            });
-            const data = await response.json();
-            respBox.innerText = data.result || (data.error ? "Error: " + data.error : "பதில் இல்லை");
-
-            if (mode === 'ask_video' && data.video_url) {
-                vContainer.style.display = "block";
-                const videoRes = await fetch(data.video_url);
-                const blob = await videoRes.blob();
-                vPlayer.src = URL.createObjectURL(blob);
-                vPlayer.load();
-                vPlayer.play();
-            }
-        } catch (error) { respBox.innerText = "சர்வர் இணைப்புத் தோல்வி!"; }
-    }
-</script>
